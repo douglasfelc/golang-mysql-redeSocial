@@ -25,10 +25,9 @@ func NewUsersRepository(db *sql.DB) *users {
 
 // Create insert a user into the database
 func (repository users) Create(user models.User) (uint64, error) {
-	return 0, nil
 
 	// Prepare statement
-	statement, erro := repository.db.Prepare("INSERT INTO users(name, nick, email, password) VALUES (?, ?, ?, ?)")
+	statement, erro := repository.db.Prepare("INSERT INTO users (name, nick, email, password) VALUES (?, ?, ?, ?)")
 	if erro != nil {
 		return 0, erro
 	}

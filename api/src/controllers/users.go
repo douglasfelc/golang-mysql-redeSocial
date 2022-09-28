@@ -4,10 +4,9 @@ import (
 	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
+	"api/src/responses"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -17,31 +16,44 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	// Reads the Request.Body
 	requestBody, erro := ioutil.ReadAll(r.Body)
 	if erro != nil {
-		log.Fatal(erro)
+		responses.Erro(w, http.StatusUnprocessableEntity, erro)
+		return
 	}
 
 	var user models.User
 	// Convert JSON (requestBody) to struct (user)
 	if erro = json.Unmarshal(requestBody, &user); erro != nil {
-		log.Fatal(erro)
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	// User validation
+	if erro = user.Prepare(); erro != nil {
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
 	}
 
 	// Connect to the database
 	db, erro := database.Connect()
 	if erro != nil {
-		log.Fatal(erro)
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
 	}
+	defer db.Close()
 
 	// Create the repository, passing the database as a parameter
 	repository := repositories.NewUsersRepository(db)
 
 	// Create the user in the database, using the Create method
-	userID, erro := repository.Create(user)
+	// The Create method returns the user id
+	user.ID, erro = repository.Create(user)
 	if erro != nil {
-		log.Fatal(erro)
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
 	}
 
-	w.Write([]byte(fmt.Sprintf("Id inserido: %d", userID)))
+	// If successful, reply with StatusCreated, and user
+	responses.JSON(w, http.StatusCreated, user)
 }
 
 // GetUsers ...
