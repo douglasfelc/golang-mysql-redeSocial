@@ -1,9 +1,12 @@
 package models
 
 import (
+	"api/src/security"
 	"errors"
 	"strings"
 	"time"
+
+	"github.com/badoux/checkmail"
 )
 
 // User struct
@@ -20,7 +23,9 @@ type User struct {
 // Prepare user (format and validate)
 func (user *User) Prepare(stage string) error {
 	// format user
-	user.format()
+	if error := user.format(stage); error != nil {
+		return error
+	}
 
 	// validate user
 	if error := user.validate(stage); error != nil {
@@ -44,6 +49,10 @@ func (user *User) validate(stage string) error {
 		return errors.New("Email is required")
 	}
 
+	if error := checkmail.ValidateFormat(user.Email); error != nil {
+		return errors.New("Invalid email address") // Custom error return
+	}
+
 	if stage == "newRegister" && user.Password == "" {
 		return errors.New("Password is required")
 	}
@@ -52,9 +61,21 @@ func (user *User) validate(stage string) error {
 }
 
 // format user data
-func (user *User) format() {
+func (user *User) format(stage string) error {
 	// TrimSpace remove leading and trailing whitespace
 	user.Name = strings.TrimSpace(user.Name)
 	user.Nick = strings.TrimSpace(user.Nick)
 	user.Email = strings.TrimSpace(user.Email)
+
+	if stage == "newRegister" {
+		passwordWithHash, error := security.Hash(user.Password)
+		if error != nil {
+			return error
+		}
+
+		// Convert to string
+		user.Password = string(passwordWithHash)
+	}
+
+	return nil
 }
