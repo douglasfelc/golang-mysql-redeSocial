@@ -18,20 +18,20 @@ type User struct {
 }
 
 // Prepare user (format and validate)
-func (user *User) Prepare() error {
+func (user *User) Prepare(stage string) error {
 	// format user
 	user.format()
 
 	// validate user
-	if erro := user.validate(); erro != nil {
-		return erro
+	if error := user.validate(stage); error != nil {
+		return error
 	}
 
 	return nil
 }
 
 // validade validates if the fields are filled
-func (user *User) validate() error {
+func (user *User) validate(stage string) error {
 	if user.Name == "" {
 		return errors.New("Name is required")
 	}
@@ -44,7 +44,7 @@ func (user *User) validate() error {
 		return errors.New("Email is required")
 	}
 
-	if user.Password == "" {
+	if stage == "newRegister" && user.Password == "" {
 		return errors.New("Password is required")
 	}
 

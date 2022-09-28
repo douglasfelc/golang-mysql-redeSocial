@@ -18,18 +18,18 @@ var (
 
 // Load will initialize environment variables
 func Load() {
-	var erro error
+	var error error
 
 	// If unable to load environment variables
-	if erro = godotenv.Load(); erro != nil {
+	if error = godotenv.Load(); error != nil {
 		// Stops application and displays error
-		log.Fatal(erro)
+		log.Fatal(error)
 	}
 
 	// Convert API_PORT(.env) string to integer
-	Port, erro = strconv.Atoi(os.Getenv("API_PORT"))
+	Port, error = strconv.Atoi(os.Getenv("API_PORT"))
 	// if you can't read
-	if erro != nil {
+	if error != nil {
 		// Set default port 9000
 		Port = 9000
 	}

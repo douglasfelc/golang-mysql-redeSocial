@@ -12,5 +12,5 @@ CREATE TABLE `users` (
   `nick` VARCHAR(50) NOT NULL UNIQUE,
   `email` VARCHAR(50) NOT NULL UNIQUE,
   `password` VARCHAR(20) NOT NULL,
-  `createAt` TIMESTAMP DEFAULT current_timestamp()
+  `createdAt` TIMESTAMP DEFAULT current_timestamp()
 ) ENGINE=INNODB;

@@ -9,17 +9,17 @@ import (
 
 // Connect database
 func Connect() (*sql.DB, error) {
-	db, erro := sql.Open("mysql", config.DatabaseConnection)
-	if erro != nil {
-		return nil, erro
+	db, error := sql.Open("mysql", config.DatabaseConnection)
+	if error != nil {
+		return nil, error
 	}
 
 	// If the connection is not responding
-	if erro = db.Ping(); erro != nil {
+	if error = db.Ping(); error != nil {
 		// Close connection
 		db.Close()
 
-		return nil, erro
+		return nil, error
 	}
 
 	return db, nil

@@ -8,20 +8,27 @@ import (
 
 // JSON returns a JSON response to the request
 func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
+	// Defines in the header that the response type is JSON
+	w.Header().Set("Content-Type", "application/json")
+
 	w.WriteHeader(statusCode)
 
-	// Convert data to JSON
-	if erro := json.NewEncoder(w).Encode(data); erro != nil {
-		log.Fatal(erro)
+	// If have data
+	if data != nil {
+		// Convert data to JSON
+		if error := json.NewEncoder(w).Encode(data); error != nil {
+			log.Fatal(error)
+		}
 	}
+
 }
 
 // Error returns an error in JSON format
-func Erro(w http.ResponseWriter, statusCode int, erro error) {
+func Error(w http.ResponseWriter, statusCode int, error error) {
 	// Calls JSON(), passing the error response structure
 	JSON(w, statusCode, struct {
-		Erro string `json:"erro"`
+		Error string `json:"error"`
 	}{
-		Erro: erro.Error(),
+		Error: error.Error(),
 	})
 }
