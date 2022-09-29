@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"api/src/authentication"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
 	"api/src/responses"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -132,6 +134,22 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Extract the userId from the token, to check its permissions
+	userIDinToken, error := authentication.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+
+	// Check permission
+	// Checks if the user being updated is different from the user requesting the change
+	if userID != userIDinToken {
+		responses.Error(w, http.StatusForbidden,
+			errors.New("You are not allowed to change this user"),
+		)
+		return
+	}
+
 	// Reads the Request.Body
 	requestBody, error := ioutil.ReadAll(r.Body)
 	if error != nil {
@@ -182,6 +200,22 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userID, error := strconv.ParseUint(params["userId"], 10, 64)
 	if error != nil {
 		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// Extract the userId from the token, to check its permissions
+	userIDinToken, error := authentication.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+
+	// Check permission
+	// Checks if the user being deleted is different from the user requesting the change
+	if userID != userIDinToken {
+		responses.Error(w, http.StatusForbidden,
+			errors.New("You do not have permission to delete this user"),
+		)
 		return
 	}
 

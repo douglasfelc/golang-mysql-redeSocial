@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"api/src/middlewares"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,12 +18,27 @@ type Router struct {
 // Configure put all routes inside the router
 func Configure(r *mux.Router) *mux.Router {
 	routers := userRouters
+	routers = append(routers, loginRouter)
 
 	// For each route of the routes
 	for _, route := range routers {
-		//Register a new route with a matcher for the URL path
-		//Ex: r.HandleFunc("/users", function).Methods("POST")
-		r.HandleFunc(route.URI, route.Function).Methods(route.Method)
+
+		// If the route requires authentication
+		if route.authenticationRequired {
+			// Register a new route with a matcher for the URL path
+			r.HandleFunc(route.URI,
+				middlewares.Logger(
+					middlewares.Authenticate(route.Function),
+				),
+			).Methods(route.Method)
+		} else {
+			//Register a new route with a matcher for the URL path
+			//Ex: r.HandleFunc("/users", function).Methods("POST")
+			r.HandleFunc(route.URI,
+				middlewares.Logger(route.Function),
+			).Methods(route.Method)
+		}
+
 	}
 
 	return r

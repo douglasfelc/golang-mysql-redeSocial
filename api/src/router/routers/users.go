@@ -18,27 +18,27 @@ var userRouters = []Router{
 		URI:                    "/users",
 		Method:                 http.MethodGet,
 		Function:               controllers.GetUsers,
-		authenticationRequired: false,
+		authenticationRequired: true,
 	},
 	// Route to return a user by id
 	{
 		URI:                    "/users/{userId}",
 		Method:                 http.MethodGet,
 		Function:               controllers.GetUser,
-		authenticationRequired: false,
+		authenticationRequired: true,
 	},
 	// Route to change user by id
 	{
 		URI:                    "/users/{userId}",
 		Method:                 http.MethodPut,
 		Function:               controllers.UpdateUser,
-		authenticationRequired: false,
+		authenticationRequired: true,
 	},
 	// Route to delete user by id
 	{
 		URI:                    "/users/{userId}",
 		Method:                 http.MethodDelete,
 		Function:               controllers.DeleteUser,
-		authenticationRequired: false,
+		authenticationRequired: true,
 	},
 }

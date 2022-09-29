@@ -121,6 +121,33 @@ func (repository users) SearchByID(ID uint64) (models.User, error) {
 	return user, nil
 }
 
+// SearchByEmail search for a user by email and return their ID and hashed password
+func (repository users) SearchByEmail(email string) (models.User, error) {
+	// Make the request in the database
+	row, error := repository.db.Query(
+		"SELECT id, password FROM users WHERE email = ?", email,
+	)
+	if error != nil {
+		// Returns empty user to match type, and error
+		return models.User{}, error
+	}
+	defer row.Close()
+
+	var user models.User
+
+	// if you have line
+	if row.Next() {
+		// Read the line
+		if error = row.Scan(&user.ID, &user.Password); error != nil {
+			// Returns empty user to match type, and error
+			return models.User{}, error
+		}
+	}
+
+	// If successful, returns user
+	return user, nil
+}
+
 // Update user information in the database
 func (repository users) Update(ID uint64, user models.User) error {
 	// Prepare statement
