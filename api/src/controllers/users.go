@@ -6,6 +6,7 @@ import (
 	"api/src/models"
 	"api/src/repositories"
 	"api/src/responses"
+	"api/src/security"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -382,4 +383,79 @@ func GetFollowing(w http.ResponseWriter, r *http.Request) {
 
 	// If successful, reply with StatusOK and followers in JSON
 	responses.JSON(w, http.StatusOK, users)
+}
+
+// UpdatePassword update a user's password
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	// Extract the userId from the token, to check its permissions
+	userIDinToken, error := authentication.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+
+	// Get the parameters sent in the route, ex: /{userId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	userID, error := strconv.ParseUint(params["userId"], 10, 64)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// Check permission
+	// Checks if the user being updated is different from the user requesting the change
+	if userIDinToken != userID {
+		responses.Error(w, http.StatusForbidden, errors.New("You are not allowed to change this user's password"))
+		return
+	}
+
+	// Reads the Request.Body
+	requestBody, error := ioutil.ReadAll(r.Body)
+
+	var password models.Password
+	if error = json.Unmarshal(requestBody, &password); error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// Connect to the database
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+	}
+	defer db.Close()
+
+	// Create the repository, passing the database as a parameter
+	repository := repositories.NewUsersRepository(db)
+
+	// Get password from user database
+	PasswordInDataBase, error := repository.GetPassword(userID)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	// Checks if the current password sent is the same as the one in the database
+	if error = security.CheckPassword(PasswordInDataBase, password.Current); error != nil {
+		responses.Error(w, http.StatusUnauthorized, errors.New("Current password is incorrect"))
+		return
+	}
+
+	// Hash the password
+	passwordWithHash, error := security.Hash(password.New)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// Update password in database
+	if error = repository.UpdatePassword(userID, string(passwordWithHash)); error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	// If successful, reply with StatusNoContent
+	responses.JSON(w, http.StatusNoContent, nil)
 }

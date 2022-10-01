@@ -71,4 +71,14 @@ var userRouters = []Router{
 		Function:               controllers.GetFollowing,
 		authenticationRequired: true,
 	},
+	// Route to update user password
+	// Normally, POST is used to update the password.
+	// Because if you make two PUT requests passing exactly the same data, the second one will have no effect.
+	// But every time I make a request, a new hash will always be generated, that is, even if I pass the same data, the return is different, because the hash always changes
+	{
+		URI:                    "/users/{userId}/update-password",
+		Method:                 http.MethodPost,
+		Function:               controllers.UpdatePassword,
+		authenticationRequired: true,
+	},
 }
