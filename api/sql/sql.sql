@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS redeSocial;
 USE redeSocial;
 
 CREATE USER 'golang'@'localhost' IDENTIFIED BY 'golang';
-GRANT ALL PRIVILEGES ON redeSocial.* TO 'golang'@'localhost'
+GRANT ALL PRIVILEGES ON redeSocial.* TO 'golang'@'localhost';
 
 DROP TABLE IF EXISTS `users`;
 
@@ -13,4 +13,22 @@ CREATE TABLE `users` (
   `email` VARCHAR(50) NOT NULL UNIQUE,
   `password` VARCHAR(100) NOT NULL,
   `createdAt` TIMESTAMP DEFAULT current_timestamp()
+) ENGINE=INNODB;
+
+DROP TABLE IF EXISTS `followers`;
+
+CREATE TABLE `followers` (
+  `user_id` INT NOT NULL,
+  /* I define foreign key so that only valid users.id enter this table */
+  FOREIGN KEY(user_id) /* Set the key name */
+  REFERENCES users(id) /* Reference to column */
+  ON DELETE CASCADE, /* Deletes records when the referenced user is deleted */
+
+  `follower_id` INT NOT NULL,
+  FOREIGN KEY(follower_id)
+  REFERENCES users(id)
+  ON DELETE CASCADE,
+
+  /* Composite primary key: this way I guarantee that there will never be a duplicate record in the table */
+  PRIMARY KEY(user_id, follower_id)
 ) ENGINE=INNODB;

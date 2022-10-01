@@ -235,3 +235,151 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	// If successful, reply with StatusNoContent
 	responses.JSON(w, http.StatusNoContent, nil)
 }
+
+// FollowUser allows one user to follow another
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+
+	// Extract the userId from the token, to check its permissions
+	followerID, error := authentication.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+
+	// Get the parameters sent in the route, ex: /{userId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	userID, error := strconv.ParseUint(params["userId"], 10, 64)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// If the follower ID is the same as the user ID to be followed
+	if followerID == userID {
+		responses.Error(w, http.StatusForbidden, errors.New("Can't follow yourself"))
+		return
+	}
+
+	// Connect to the database
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+	}
+	defer db.Close()
+
+	// Create the repository, passing the database as a parameter
+	repository := repositories.NewUsersRepository(db)
+	if error = repository.Follow(userID, followerID); error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+	}
+
+	// If successful, reply with StatusNoContent
+	responses.JSON(w, http.StatusNoContent, nil)
+}
+
+// UnFollowUser allows one user to unfollow another
+func UnFollowUser(w http.ResponseWriter, r *http.Request) {
+
+	// Extract the userId from the token, to check its permissions
+	followerID, error := authentication.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+
+	// Get the parameters sent in the route, ex: /{userId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	userID, error := strconv.ParseUint(params["userId"], 10, 64)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// If the follower ID is the same as the user ID to be unfollowed
+	if followerID == userID {
+		responses.Error(w, http.StatusForbidden, errors.New("Can't unfollow yourself"))
+		return
+	}
+
+	// Connect to the database
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+	}
+	defer db.Close()
+
+	// Create the repository, passing the database as a parameter
+	repository := repositories.NewUsersRepository(db)
+	if error = repository.UnFollow(userID, followerID); error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+	}
+
+	// If successful, reply with StatusNoContent
+	responses.JSON(w, http.StatusNoContent, nil)
+}
+
+// GetFollowers get all followers of a user
+func GetFollowers(w http.ResponseWriter, r *http.Request) {
+	// Get the parameters sent in the route, ex: /{userId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	userID, error := strconv.ParseUint(params["userId"], 10, 64)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// Connect to the database
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+	}
+	defer db.Close()
+
+	// Create the repository, passing the database as a parameter
+	repository := repositories.NewUsersRepository(db)
+	followers, error := repository.GetFollowers(userID)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	// If successful, reply with StatusOK and followers in JSON
+	responses.JSON(w, http.StatusOK, followers)
+}
+
+// GetFollowing get all users that a user is following
+func GetFollowing(w http.ResponseWriter, r *http.Request) {
+	// Get the parameters sent in the route, ex: /{userId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	userID, error := strconv.ParseUint(params["userId"], 10, 64)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// Connect to the database
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+	}
+	defer db.Close()
+
+	// Create the repository, passing the database as a parameter
+	repository := repositories.NewUsersRepository(db)
+	users, error := repository.GetFollowing(userID)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	// If successful, reply with StatusOK and followers in JSON
+	responses.JSON(w, http.StatusOK, users)
+}
