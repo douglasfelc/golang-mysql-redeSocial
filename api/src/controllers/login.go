@@ -38,8 +38,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Create the repository, passing the database as a parameter
 	repository := repositories.NewUsersRepository(db)
 
-	// Search the repository for the user with this email and return ID and password with hash
-	databaseUser, error := repository.SearchByEmail(user.Email)
+	// Get the repository for the user with this email and return ID and password with hash
+	databaseUser, error := repository.GetByEmail(user.Email)
 	if error != nil {
 		responses.Error(w, http.StatusInternalServerError, error)
 		return

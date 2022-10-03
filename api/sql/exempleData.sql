@@ -10,3 +10,10 @@ INSERT INTO followers (user_id, follower_id) VALUES
 (1, 2),
 (3, 1),
 (1, 3);
+
+INSERT INTO posts (`title`, `content`, `author_id`) VALUES
+("Post 1 of User 1", "Content 1 of User 1", 1),
+("Post 2 of User 1", "Content 2 of User 1", 1),
+("Post 3 of User 1", "Content 3 of User 1", 1),
+("Post 1 of User 2", "Content 1 of User 2", 2),
+("Post 1 of User 3", "Content 1 of User 3", 3);

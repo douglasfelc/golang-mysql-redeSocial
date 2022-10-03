@@ -80,7 +80,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	repository := repositories.NewUsersRepository(db)
 
 	// Requests the repository to search for the name or nick passed with user in get
-	users, error := repository.Search(nameOrNick)
+	users, error := repository.Get(nameOrNick)
 	if error != nil {
 		responses.Error(w, http.StatusInternalServerError, error)
 	}
@@ -112,7 +112,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	repository := repositories.NewUsersRepository(db)
 
 	// Requests that the repository search and return the user with id sent by parameter
-	user, error := repository.SearchByID(userID)
+	user, error := repository.GetByID(userID)
 	if error != nil {
 		responses.Error(w, http.StatusInternalServerError, error)
 	}

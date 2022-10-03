@@ -50,8 +50,8 @@ func (repository users) Create(user models.User) (uint64, error) {
 	return uint64(LastInsertID), nil
 }
 
-// Search user by name or nick
-func (repository users) Search(nameOrNick string) ([]models.User, error) {
+// Get user by name or nick
+func (repository users) Get(nameOrNick string) ([]models.User, error) {
 	nameOrNick = fmt.Sprintf("%%%s%%", nameOrNick) //%nameOrNick%
 
 	// Make the request in the database
@@ -88,8 +88,8 @@ func (repository users) Search(nameOrNick string) ([]models.User, error) {
 	return users, nil
 }
 
-// SearchByID fetches the user by ID and returns it
-func (repository users) SearchByID(ID uint64) (models.User, error) {
+// GetByID get user by ID and returns it
+func (repository users) GetByID(ID uint64) (models.User, error) {
 	// Make the request in the database
 	row, error := repository.db.Query(
 		"SELECT id, name, nick, email, createdAt FROM users WHERE id = ?", ID,
@@ -121,8 +121,8 @@ func (repository users) SearchByID(ID uint64) (models.User, error) {
 	return user, nil
 }
 
-// SearchByEmail search for a user by email and return their ID and hashed password
-func (repository users) SearchByEmail(email string) (models.User, error) {
+// GetByEmail search for a user by email and return their ID and hashed password
+func (repository users) GetByEmail(email string) (models.User, error) {
 	// Make the request in the database
 	row, error := repository.db.Query(
 		"SELECT id, password FROM users WHERE email = ?", email,
