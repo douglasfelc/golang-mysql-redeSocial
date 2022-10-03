@@ -29,16 +29,37 @@ var postRouters = []Router{
 	},
 	// Route to update a post
 	{
-		URI:                    "/posts",
+		URI:                    "/posts/{postId}",
 		Method:                 http.MethodPut,
 		Function:               controllers.UpdatePost,
 		authenticationRequired: true,
 	},
 	// Route to delete a post
 	{
-		URI:                    "/posts",
+		URI:                    "/posts/{postId}",
 		Method:                 http.MethodDelete,
 		Function:               controllers.DeletePost,
+		authenticationRequired: true,
+	},
+	// Route of a user's posts
+	{
+		URI:                    "/users/{userId}/posts",
+		Method:                 http.MethodGet,
+		Function:               controllers.GetPostsByUser,
+		authenticationRequired: true,
+	},
+	// Route to like a post
+	{
+		URI:                    "/posts/{postId}/like",
+		Method:                 http.MethodPost,
+		Function:               controllers.LikePost,
+		authenticationRequired: true,
+	},
+	// Route to dislike a post
+	{
+		URI:                    "/posts/{postId}/dislike",
+		Method:                 http.MethodPost,
+		Function:               controllers.DislikePost,
 		authenticationRequired: true,
 	},
 }

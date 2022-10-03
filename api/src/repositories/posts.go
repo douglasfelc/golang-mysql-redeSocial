@@ -129,3 +129,126 @@ func (repository posts) Get(userID uint64) ([]models.Post, error) {
 	// If successful, returns posts with the filter applied
 	return posts, nil
 }
+
+// Update post information in the database
+func (repository posts) Update(postID uint64, post models.Post) error {
+	// Prepare statement
+	statement, error := repository.db.Prepare("UPDATE posts SET title = ?, content = ? WHERE id = ?")
+	if error != nil {
+		return error
+	}
+	defer statement.Close()
+
+	// Execute the update
+	if _, error := statement.Exec(post.Title, post.Content, postID); error != nil {
+		return error
+	}
+
+	return nil
+}
+
+// Delete post from database by ID
+func (repository posts) Delete(postID uint64) error {
+	// Prepare statement
+	statement, error := repository.db.Prepare("DELETE FROM posts WHERE id = ?")
+	if error != nil {
+		return error
+	}
+	defer statement.Close()
+
+	// Execute the update
+	if _, error := statement.Exec(postID); error != nil {
+		return error
+	}
+
+	return nil
+}
+
+// GetByUser get all posts of a user in the database
+func (repository posts) GetByUser(userID uint64) ([]models.Post, error) {
+
+	// Make the request in the database
+	rows, error := repository.db.Query(`
+		SELECT 
+			DISTINCT 
+			p.id, p.title, p.content, p.author_id, p.likes, p.createdAt, 
+			u.nick 
+		FROM posts p 
+		INNER JOIN users u ON u.id = p.author_id 
+		WHERE p.author_id = ? 
+	`, userID,
+	)
+	if error != nil {
+		return nil, error
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+
+	// Iterates through the rows returned from the database
+	for rows.Next() {
+		var post models.Post
+
+		// Read the line
+		if error = rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.AuthorID,
+			&post.Likes,
+			&post.CreatedAt,
+			&post.AuthorNick,
+		); error != nil {
+			return nil, error
+		}
+
+		// Include the row post in the posts slice
+		posts = append(posts, post)
+	}
+
+	// If successful, returns posts with the filter applied
+	return posts, nil
+}
+
+// Like add a like to the post
+func (repository posts) Like(postID uint64) error {
+	// Prepare statement
+	statement, error := repository.db.Prepare("UPDATE posts SET likes = likes + 1 WHERE id = ?")
+	if error != nil {
+		return error
+	}
+	defer statement.Close()
+
+	// Execute the update
+	if _, error := statement.Exec(postID); error != nil {
+		return error
+	}
+
+	return nil
+}
+
+// Dislike decrease a like on the post
+func (repository posts) Dislike(postID uint64) error {
+	// Prepare statement
+	statement, error := repository.db.Prepare(`
+		UPDATE posts 
+		SET likes = 
+			CASE 
+				WHEN likes > 0 
+					THEN likes - 1 
+				ELSE 0 
+			END
+		WHERE id = ?
+	`)
+	if error != nil {
+		return error
+	}
+	defer statement.Close()
+
+	// Execute the update
+	if _, error := statement.Exec(postID); error != nil {
+		return error
+	}
+
+	return nil
+}
