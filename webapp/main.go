@@ -5,9 +5,11 @@ import (
 	"log"
 	"net/http"
 	"webapp/src/router"
+	"webapp/src/utils"
 )
 
 func main() {
+	utils.LoadTemplates()
 	r := router.Generate()
 
 	fmt.Printf("Server listening on port: %d", 3000)
