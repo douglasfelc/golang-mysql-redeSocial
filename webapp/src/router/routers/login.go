@@ -19,4 +19,10 @@ var loginRouters = []Router{
 		Function:               controllers.LoginScreen,
 		authenticationRequired: false,
 	},
+	{
+		URI:                    "/signin",
+		Method:                 http.MethodGet,
+		Function:               controllers.LoginScreen,
+		authenticationRequired: false,
+	},
 }

@@ -17,6 +17,8 @@ type Router struct {
 // Configure put all routes inside the router
 func Configure(r *mux.Router) *mux.Router {
 	routers := loginRouters
+	// Append with "..." to get each slice item individually, and add
+	routers = append(routers, userRouters...)
 
 	// For each route of the routes
 	for _, route := range routers {
