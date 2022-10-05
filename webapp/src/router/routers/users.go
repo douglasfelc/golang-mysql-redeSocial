@@ -13,4 +13,11 @@ var userRouters = []Router{
 		Function:               controllers.SignUpScreen,
 		authenticationRequired: false,
 	},
+	// Route to add a new user
+	{
+		URI:                    "/users",
+		Method:                 http.MethodPost,
+		Function:               controllers.CreateUser,
+		authenticationRequired: false,
+	},
 }
