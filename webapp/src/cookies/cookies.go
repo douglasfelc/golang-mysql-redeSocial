@@ -35,3 +35,20 @@ func Save(w http.ResponseWriter, ID, token string) error {
 
 	return nil
 }
+
+// Read the cookie and return the values
+func Read(r *http.Request) (map[string]string, error) {
+
+	cookie, error := r.Cookie("redeSocialCookie")
+	if error != nil {
+		return nil, error
+	}
+
+	// Decode the cookie and map the values
+	values := make(map[string]string)
+	if error := s.Decode("redeSocialCookie", cookie.Value, &values); error != nil {
+		return nil, error
+	}
+
+	return values, nil
+}

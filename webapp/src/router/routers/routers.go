@@ -2,6 +2,7 @@ package routers
 
 import (
 	"net/http"
+	"webapp/src/middlewares"
 
 	"github.com/gorilla/mux"
 )
@@ -19,12 +20,27 @@ func Configure(r *mux.Router) *mux.Router {
 	routers := signinRouters
 	// Append with "..." to get each slice item individually, and add
 	routers = append(routers, userRouters...)
+	routers = append(routers, feedRouter)
 
 	// For each route of the routes
 	for _, route := range routers {
-		//Register a new route with a matcher for the URL path
-		//Ex: r.HandleFunc("/users", function).Methods("POST")
-		r.HandleFunc(route.URI, route.Function).Methods(route.Method)
+
+		// If the route requires authentication
+		if route.authenticationRequired {
+			// Register a new route with a matcher for the URL path
+			r.HandleFunc(route.URI,
+				middlewares.Logger(
+					middlewares.Authenticate(route.Function),
+				),
+			).Methods(route.Method)
+		} else {
+			//Register a new route with a matcher for the URL path
+			//Ex: r.HandleFunc("/users", function).Methods("POST")
+			r.HandleFunc(route.URI,
+				middlewares.Logger(route.Function),
+			).Methods(route.Method)
+		}
+
 	}
 
 	// Defines the assets folder

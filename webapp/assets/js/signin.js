@@ -20,12 +20,13 @@ function userSignIn(event){
         alert("Error signin! Incorrect username or password!")
       }else{
         // StatusCode: range of 200
-        alert("Signin successfully!")
+        console.log("Signin successfully!")
+        window.location = "/feed"
       }
     }
   }).done(function(){
     console.log("Done signin")
-    //window.location = "/"
+    //window.location = "/feed"
 
   }).fail(function(){
     console.log("Fail signin")
