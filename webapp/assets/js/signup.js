@@ -17,14 +17,27 @@ function userSignUp(event){
       nick: $("#nick").val(),
       email: $("#email").val(),
       password: $("#password").val(),
-    }
-  }).done(function() {
-    // StatusCode: range of 200
-    alert("User registered successfully!")
+    },
+    success: function (response) {
+      console.log("success");
+      console.info(response)
+    },
+    error: function (response) {
+      console.log("error");
+      console.info(response)
+    },
+    complete: function (response) {
+      console.info(response)
+      console.info(response.status)
 
-  }).fail(function(error) {
-    console.log(error)
-    // StatusCode: range of 400 or 500
-    alert("Error registering user!")
+      if (response.status >= 400){
+        // StatusCode: range of 400 or 500
+        alert("Error registering user!")
+      }else{
+        // StatusCode: range of 200
+        alert("User registered successfully!")
+      }
+    }
   })
+
 }

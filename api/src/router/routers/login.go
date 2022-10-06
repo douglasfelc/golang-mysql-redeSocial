@@ -6,9 +6,9 @@ import (
 )
 
 // Route to register a user
-var loginRouter = Router{
-	URI:                    "/login",
+var signinRouter = Router{
+	URI:                    "/signin",
 	Method:                 http.MethodPost,
-	Function:               controllers.Login,
+	Function:               controllers.Signin,
 	authenticationRequired: false,
 }

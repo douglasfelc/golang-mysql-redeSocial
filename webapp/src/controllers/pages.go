@@ -7,9 +7,9 @@ import (
 	"webapp/src/utils"
 )
 
-// LoginScreen renders the login screen
-func LoginScreen(w http.ResponseWriter, r *http.Request) {
-	utils.ExecuteTemplate(w, "login.html", nil)
+// SignInScreen renders the signin screen
+func SignInScreen(w http.ResponseWriter, r *http.Request) {
+	utils.ExecuteTemplate(w, "signin.html", nil)
 }
 
 // SignUpScreen renders the user registration page
