@@ -21,6 +21,7 @@ func Configure(r *mux.Router) *mux.Router {
 	// Append with "..." to get each slice item individually, and add
 	routers = append(routers, userRouters...)
 	routers = append(routers, feedRouter)
+	routers = append(routers, postRouters...)
 
 	// For each route of the routes
 	for _, route := range routers {

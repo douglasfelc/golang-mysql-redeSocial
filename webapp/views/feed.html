@@ -8,81 +8,49 @@
 
   <link href="/assets/css/bootstrap.css" rel="stylesheet" type="text/css">
 </head>
-<body>
+<body class="bg-light">
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Rede Social</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/feed">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/profile">My profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/signout">Sign out</a>
-          </li>
-        </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container-fluid">
-    <div class="row mt-4">
-      <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-5">
-        <h3>New Post</h3>
-        <fieldset>
-          <form id="nova-publicacao">
-            <div class="form-group">
-              <label for="title">Title</label>
-              <input type="text" class="form-control" id="title" name="title" required="required" placeholder="Enter the title of your post">
-            </div>
-            <div class="form-group">
-              <label for="content">Content</label>
-              <textarea class="form-control" id="content" name="content" required="required" placeholder="Enter the content of your post"></textarea>
-            </div>
-            <button class="btn btn-primary" type="submit">
-              Post
-            </button>
-          </form>
-        </fieldset>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7">
+  <div class="container mt-4">
+    <div class="row">
+      {{ template "menu-main" }}
+      <div class="col">
         {{ range . }}
-          <div class="p-5 mb-4 bg-light border rounded-3">
-            <h2>{{ .Title }}</h2>
+          <div class="p-5 mb-4 bg-white border rounded-3">
+            <p><a href="#">@{{ .AuthorNick }} - {{ .CreatedAt }}</a></p>
             <p>{{ .Content }}</p>
-            <p><a href="#"> {{ .AuthorNick }} - {{ .CreatedAt }} </a></p>
             <p><button class="btn btn-outline-secondary" type="button">Example button</button></p>
           </div>
         {{ end }}
       </div>
+      <div class="col-3 hidden-sm">
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search on Rede Social" aria-label="Search">
+        </form>
+
+        <div class="p-3 mt-4 bg-white border rounded-3">
+          <fieldset>
+            <form id="new-post">
+              <div class="form-group">
+                <textarea class="form-control bg-light" id="content" name="content" required="required" placeholder="What's on your mind?" maxlength="255"></textarea>
+              </div>
+              <button class="btn btn-primary mt-2 float-end" type="submit">
+                Post
+              </button>
+            </form>
+          </fieldset>
+        </div>
+
+        <div class="p-3 mt-4 bg-white border rounded-3">
+          Who to follow?
+        </div>
+      </div>
     </div>
   </div>
 
-  <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-    <div class="col-md-4 d-flex align-items-center">
-      <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
-        <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
-      </a>
-      <span class="mb-3 mb-md-0 text-muted">© Rede Social, Inc</span>
-    </div>
-
-    <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-      <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
-      <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
-      <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
-    </ul>
-  </footer>
-
+  {{ template "footer" }}
+  <!-- Global scripts -->
+  {{ template "scripts" }}
+  <!-- Scripts for this view -->
+  <script src="/assets/js/posts.js"></script>
 </body>
 </html>

@@ -11,6 +11,7 @@ var templates *template.Template
 func LoadTemplates() {
 	// Where are the template files located
 	templates = template.Must(template.ParseGlob("views/*.html"))
+	templates = template.Must(templates.ParseGlob("views/templates/*.html"))
 }
 
 // ExecuteTemplate renders an html page on the screen

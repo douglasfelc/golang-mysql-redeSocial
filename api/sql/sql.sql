@@ -35,8 +35,7 @@ CREATE TABLE `followers` (
 
 CREATE TABLE `posts` (
   `id` INT auto_increment PRIMARY KEY,
-  `title` VARCHAR(100) NOT NULL,
-  `content` TEXT NOT NULL,
+  `content` VARCHAR(255) NOT NULL,
 
   `author_id` INT NOT NULL,
   FOREIGN KEY(author_id)

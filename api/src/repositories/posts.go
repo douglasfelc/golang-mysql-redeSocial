@@ -19,14 +19,14 @@ func NewPostsRepository(db *sql.DB) *posts {
 func (repository posts) Create(post models.Post) (uint64, error) {
 
 	// Prepare statement
-	statement, error := repository.db.Prepare("INSERT INTO posts (title, content, author_id) VALUES (?, ?, ?)")
+	statement, error := repository.db.Prepare("INSERT INTO posts (content, author_id) VALUES (?, ?)")
 	if error != nil {
 		return 0, error
 	}
 	defer statement.Close()
 
 	// Execute the insert
-	insert, error := statement.Exec(post.Title, post.Content, post.AuthorID)
+	insert, error := statement.Exec(post.Content, post.AuthorID)
 	if error != nil {
 		return 0, error
 	}
@@ -46,7 +46,7 @@ func (repository posts) GetByID(ID uint64) (models.Post, error) {
 	// Make the request in the database
 	row, error := repository.db.Query(`
 		SELECT 
-			p.id, p.title, p.content, p.author_id, p.likes, p.createdAt, 
+			p.id, p.content, p.author_id, p.likes, p.createdAt, 
 			u.nick 
 		FROM posts p 
 		INNER JOIN users u ON u.id = p.author_id 
@@ -66,7 +66,6 @@ func (repository posts) GetByID(ID uint64) (models.Post, error) {
 		// Read the line
 		if error = row.Scan(
 			&post.ID,
-			&post.Title,
 			&post.Content,
 			&post.AuthorID,
 			&post.Likes,
@@ -89,7 +88,7 @@ func (repository posts) Get(userID uint64) ([]models.Post, error) {
 	rows, error := repository.db.Query(`
 		SELECT 
 			DISTINCT 
-			p.id, p.title, p.content, p.author_id, p.likes, p.createdAt, 
+			p.id, p.content, p.author_id, p.likes, p.createdAt, 
 			u.nick 
 		FROM posts p 
 		INNER JOIN users u ON u.id = p.author_id 
@@ -112,7 +111,6 @@ func (repository posts) Get(userID uint64) ([]models.Post, error) {
 		// Read the line
 		if error = rows.Scan(
 			&post.ID,
-			&post.Title,
 			&post.Content,
 			&post.AuthorID,
 			&post.Likes,
@@ -133,14 +131,14 @@ func (repository posts) Get(userID uint64) ([]models.Post, error) {
 // Update post information in the database
 func (repository posts) Update(postID uint64, post models.Post) error {
 	// Prepare statement
-	statement, error := repository.db.Prepare("UPDATE posts SET title = ?, content = ? WHERE id = ?")
+	statement, error := repository.db.Prepare("UPDATE posts SET content = ? WHERE id = ?")
 	if error != nil {
 		return error
 	}
 	defer statement.Close()
 
 	// Execute the update
-	if _, error := statement.Exec(post.Title, post.Content, postID); error != nil {
+	if _, error := statement.Exec(post.Content, postID); error != nil {
 		return error
 	}
 
@@ -171,7 +169,7 @@ func (repository posts) GetByUser(userID uint64) ([]models.Post, error) {
 	rows, error := repository.db.Query(`
 		SELECT 
 			DISTINCT 
-			p.id, p.title, p.content, p.author_id, p.likes, p.createdAt, 
+			p.id, p.content, p.author_id, p.likes, p.createdAt, 
 			u.nick 
 		FROM posts p 
 		INNER JOIN users u ON u.id = p.author_id 
@@ -192,7 +190,6 @@ func (repository posts) GetByUser(userID uint64) ([]models.Post, error) {
 		// Read the line
 		if error = rows.Scan(
 			&post.ID,
-			&post.Title,
 			&post.Content,
 			&post.AuthorID,
 			&post.Likes,
