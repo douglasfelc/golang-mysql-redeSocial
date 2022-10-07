@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/models"
 	"webapp/src/requests"
 	"webapp/src/responses"
@@ -46,7 +48,18 @@ func FeedScreen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(posts)
+	// Read the Cookie, ignoring the error as the middleware has already verified this
+	cookie, _ := cookies.Read(r)
 
-	utils.ExecuteTemplate(w, "feed.html", posts)
+	// Convert the id in the cookie to uint64
+	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	// Send request posts and cookie userID to the template
+	utils.ExecuteTemplate(w, "feed.html", struct {
+		Posts  []models.Post
+		UserID uint64
+	}{
+		Posts:  posts,
+		UserID: userID,
+	})
 }

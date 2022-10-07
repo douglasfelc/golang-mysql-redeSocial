@@ -14,20 +14,7 @@
     <div class="row">
       {{ template "menu-main" }}
       <div class="col">
-        {{ range . }}
-          <div class="p-5 mb-4 bg-white border rounded-3">
-            <p><a href="#">@{{ .AuthorNick }} - {{ .CreatedAt }}</a></p>
-            <p>{{ .Content }}</p>
-            <p><button class="btn btn-outline-secondary" type="button">Example button</button></p>
-          </div>
-        {{ end }}
-      </div>
-      <div class="col-3 hidden-sm">
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search on Rede Social" aria-label="Search">
-        </form>
-
-        <div class="p-3 mt-4 bg-white border rounded-3">
+        <div class="p-3 mb-4 bg-white border rounded-3">
           <fieldset>
             <form id="new-post">
               <div class="form-group">
@@ -39,6 +26,19 @@
             </form>
           </fieldset>
         </div>
+
+        {{ range .Posts }}
+          {{ if (eq .AuthorID $.UserID) }}
+              {{ template "post-with-permission" . }}
+          {{ else }}
+              {{ template "post-without-permission" . }}
+          {{ end }}
+        {{ end }}
+      </div>
+      <div class="col-3 d-none d-sm-none d-md-inline">
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search on Rede Social" aria-label="Search">
+        </form>
 
         <div class="p-3 mt-4 bg-white border rounded-3">
           Who to follow?

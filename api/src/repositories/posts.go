@@ -93,7 +93,7 @@ func (repository posts) Get(userID uint64) ([]models.Post, error) {
 		FROM posts p 
 		INNER JOIN users u ON u.id = p.author_id 
 		INNER JOIN followers f ON p.author_id = f.user_id
-		WHERE p.id = ? OR f.follower_id = ? 
+		WHERE p.author_id = ? OR f.follower_id = ? 
 		ORDER BY 1 DESC
 	`, userID, userID,
 	)
