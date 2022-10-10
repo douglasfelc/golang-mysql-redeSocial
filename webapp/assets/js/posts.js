@@ -1,5 +1,8 @@
 $("#new-post").on("submit", newPost)
 
+$(document).on("click", ".like-post", disLikePost);
+$(document).on("click", ".dislike-post", disLikePost);
+
 function newPost(event){
   // Prevent form submission
   event.preventDefault()
@@ -29,5 +32,67 @@ function newPost(event){
 
   }).fail(function(){
     console.log("Fail post")
+  })
+}
+
+function disLikePost(event) {
+  // Prevent form submission
+  event.preventDefault()
+
+  // Checks if the element has the dislike class
+  var hasClass = Array.from(event.target.classList).indexOf("dislike-post") > -1;
+  if (hasClass == true) {
+    var action = "dislike"
+  } else {
+    var action = "like"
+  }
+
+  // Get the clicked element
+  let clickedElement = $(event.target)
+
+  // Search for the closest div, and get the content of data-post-id
+  let postId = clickedElement.closest("div").data("post-id")
+
+  clickedElement.prop("disabled", true)
+  $.ajax({
+    url: "/posts/"+postId+"/"+action,
+    method: "POST",
+    data: {
+      content: $("#content").val(),
+    }
+  }).done(function(){
+
+    // Get the next span element it finds, where the current amount of likes are
+    let likesCount_span = clickedElement.next("span")
+
+    // Convert span text to integer
+    let likesCount = parseInt(likesCount_span.text())
+
+    if( action == 'like' ){
+      // Change span text with incremented counter
+      likesCount_span.text(likesCount + 1)
+
+      clickedElement.addClass("text-danger")
+
+      // Change class to on click again dislike post
+      clickedElement.removeClass("like-post")
+      clickedElement.addClass("dislike-post")
+    }else{
+      // Change span text with decremented counter
+      likesCount_span.text(likesCount - 1)
+
+      clickedElement.removeClass("text-danger")
+
+      // Change class to on click again like post
+      clickedElement.removeClass("dislike-post")
+      clickedElement.addClass("like-post")
+    }
+
+  }).fail(function(response){
+    console.log("Fail like")
+    console.info(response)
+
+  }).always(function() {
+    clickedElement.prop("disabled", false)
   })
 }
