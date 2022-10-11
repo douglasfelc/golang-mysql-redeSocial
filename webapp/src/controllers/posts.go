@@ -110,3 +110,78 @@ func DisLikePost(w http.ResponseWriter, r *http.Request) {
 
 	responses.JSON(w, responseHttp.StatusCode, nil)
 }
+
+// UpdatePost calls the API to update a post
+func UpdatePost(w http.ResponseWriter, r *http.Request) {
+	// Get the parameters sent in the route, ex: /{postId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	postID, error := strconv.ParseUint(params["postId"], 10, 64)
+	if error != nil {
+		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	// To access form fields with FormValue
+	r.ParseForm()
+
+	// Convert the data submitted in the form to JSON
+	post, error := json.Marshal(map[string]string{
+		"content": r.FormValue("content"),
+	})
+	if error != nil {
+		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	// Mount the url, eg http://localhost:5000/posts/{postId}
+	url := fmt.Sprintf("%s/posts/%d", config.APIURL, postID)
+	// Send the request with authentication to the API with the data
+	responseHttp, error := requests.RequestWithAuthentication(r, http.MethodPut, url, bytes.NewBuffer(post))
+	if error != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+	defer responseHttp.Body.Close()
+
+	// If in range of the Error StatusCode
+	if responseHttp.StatusCode >= 400 {
+		responses.StatusCodeError(w, responseHttp)
+		return
+	}
+
+	responses.JSON(w, responseHttp.StatusCode, nil)
+}
+
+// DeletePost calls the API to delete a post
+func DeletePost(w http.ResponseWriter, r *http.Request) {
+	// Get the parameters sent in the route, ex: /{postId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	postID, error := strconv.ParseUint(params["postId"], 10, 64)
+	if error != nil {
+		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	// Mount the url, eg http://localhost:5000/posts/{postId}
+	url := fmt.Sprintf("%s/posts/%d", config.APIURL, postID)
+
+	// Send the request with authentication to the API with the data
+	responseHttp, error := requests.RequestWithAuthentication(r, http.MethodDelete, url, nil)
+	if error != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+	defer responseHttp.Body.Close()
+
+	// If in range of the Error StatusCode
+	if responseHttp.StatusCode >= 400 {
+		responses.StatusCodeError(w, responseHttp)
+		return
+	}
+
+	responses.JSON(w, responseHttp.StatusCode, nil)
+}

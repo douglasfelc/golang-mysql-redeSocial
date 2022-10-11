@@ -19,7 +19,7 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 	w.WriteHeader(statusCode)
 
 	// If have data
-	if data != nil {
+	if statusCode != http.StatusNoContent {
 		// Convert data to JSON
 		if error := json.NewEncoder(w).Encode(data); error != nil {
 			log.Fatal(error)

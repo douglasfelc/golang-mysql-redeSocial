@@ -1,7 +1,9 @@
 $("#new-post").on("submit", newPost)
+$("#update-post").on("submit", updatePost)
 
 $(document).on("click", ".like-post", disLikePost);
 $(document).on("click", ".dislike-post", disLikePost);
+$(document).on("click", ".delete-post", deletePost);
 
 function newPost(event){
   // Prevent form submission
@@ -19,7 +21,7 @@ function newPost(event){
 
       if (response.status >= 400){
         // StatusCode: range of 400 or 500
-        alert("Error post")
+        Swal.fire("Ops...", "Error post", "error")
       }else{
         // StatusCode: range of 200
         console.log("Post successfully!")
@@ -89,10 +91,71 @@ function disLikePost(event) {
     }
 
   }).fail(function(response){
-    console.log("Fail like")
+    Swal.fire("Ops...", "Error "+action+" post", "error")
     console.info(response)
 
   }).always(function() {
     clickedElement.prop("disabled", false)
   })
+}
+
+function updatePost(event){
+  // Prevent form submission
+  event.preventDefault()
+
+  $("#update-post-submit-btn").prop("disabled", true)
+  const postId = $('#id').val()
+
+  $.ajax({
+    url: "/posts/"+postId,
+    method: "PUT",
+    data: {
+      content: $('#content').val()
+    }
+  }).done(function() {
+    Swal.fire('Success!', 'Post successfully updated!', 'success')
+    .then(function() {
+      window.location = "/feed";
+    })
+  }).fail(function() {
+      Swal.fire("Ops...", "Error updating post!", "error");
+  }).always(function() {
+    $("#update-post-submit-btn").prop("disabled", false)
+  })
+
+}
+
+function deletePost(event) {
+  event.preventDefault();
+
+  Swal.fire({
+    title: "Attention!",
+    text: "Are you sure you want to delete this post? This action is irreversible!",
+    showCancelButton: true,
+    cancelButtonText: "Cancel",
+    icon: "warning"
+  }).then(function(confirm) {
+    if (!confirm.value) return;
+
+    // Get the clicked element
+    const clickedElement = $(event.target)
+    
+    // Search for the closest div, and get the content of data-post-id
+    const post = clickedElement.closest('div')
+    const postId = post.data('post-id');
+
+    clickedElement.prop('disabled', true);
+
+    $.ajax({
+      url: "/posts/"+postId,
+      method: "DELETE"
+    }).done(function() {
+      post.fadeOut("slow", function() {
+        $(this).remove();
+      });
+    }).fail(function() {
+      Swal.fire("Ops...", "Error deleting post!", "error");
+    });
+  })
+
 }

@@ -1,0 +1,51 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rede Social - Update Post</title>
+  
+  <link href="/assets/css/bootstrap.css" rel="stylesheet" type="text/css">
+</head>
+
+<body class="bg-light">
+
+  <div class="container mt-4">
+    <div class="row">
+      {{ template "menu-main" }}
+      <div class="col">
+        <div class="p-3 mb-4 bg-white border rounded-3">
+          <fieldset>
+            <form id="update-post">
+              <input type="hidden" name="id" id="id" value="{{ .ID }}">
+              <div class="form-group">
+                <textarea class="form-control bg-light" id="content" name="content" required="required" placeholder="What's on your mind?" maxlength="255">{{ .Content }}</textarea>
+              </div>
+              <button class="btn btn-primary mt-2 float-end" type="submit">
+                Update post
+              </button>
+            </form>
+          </fieldset>
+        </div>
+      </div>
+      <div class="col-3 d-none d-sm-none d-md-inline">
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search on Rede Social" aria-label="Search">
+        </form>
+
+        <div class="p-3 mt-4 bg-white border rounded-3">
+          Who to follow?
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  {{ template "footer" }}
+  <!-- Global scripts -->
+  {{ template "scripts" }}
+  <!-- Scripts for this view -->
+  <script src="/assets/js/posts.js"></script>
+
+</body>
+</html>

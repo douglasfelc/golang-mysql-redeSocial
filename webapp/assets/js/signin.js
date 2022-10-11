@@ -17,7 +17,7 @@ function userSignIn(event){
 
       if (response.status >= 400){
         // StatusCode: range of 400 or 500
-        alert("Error signin! Incorrect username or password!")
+        Swal.fire("Error signin!", "Incorrect username or password", "error")
       }else{
         // StatusCode: range of 200
         console.log("Signin successfully!")

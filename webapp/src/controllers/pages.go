@@ -13,6 +13,8 @@ import (
 	"webapp/src/requests"
 	"webapp/src/responses"
 	"webapp/src/utils"
+
+	"github.com/gorilla/mux"
 )
 
 // SignInScreen renders the signin screen
@@ -62,4 +64,40 @@ func FeedScreen(w http.ResponseWriter, r *http.Request) {
 		Posts:  posts,
 		UserID: userID,
 	})
+}
+
+// UpdatePostScreen renders the post edit page
+func UpdatePostScreen(w http.ResponseWriter, r *http.Request) {
+	// Get the parameters sent in the route, ex: /{postId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	postID, error := strconv.ParseUint(params["postId"], 10, 64)
+	if error != nil {
+		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/posts/%d", config.APIURL, postID)
+	response, error := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
+	if error != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.StatusCodeError(w, response)
+		return
+	}
+
+	var post models.Post
+	// Convert response body from JSON to struct
+	if error = json.NewDecoder(response.Body).Decode(&post); error != nil {
+		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	// Send request posts to the template
+	utils.ExecuteTemplate(w, "post-update.html", post)
 }

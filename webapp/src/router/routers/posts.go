@@ -27,4 +27,25 @@ var postRouters = []Router{
 		Function:               controllers.DisLikePost,
 		authenticationRequired: true,
 	},
+	// Route to load a page to update a post
+	{
+		URI:                    "/posts/{postId}/update",
+		Method:                 http.MethodGet,
+		Function:               controllers.UpdatePostScreen,
+		authenticationRequired: true,
+	},
+	// Route to update a post
+	{
+		URI:                    "/posts/{postId}",
+		Method:                 http.MethodPut,
+		Function:               controllers.UpdatePost,
+		authenticationRequired: true,
+	},
+	// Route to delete a post
+	{
+		URI:                    "/posts/{postId}",
+		Method:                 http.MethodDelete,
+		Function:               controllers.DeletePost,
+		authenticationRequired: true,
+	},
 }

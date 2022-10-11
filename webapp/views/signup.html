@@ -6,35 +6,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rede Social - Sign Up</title>
 
+  <link href="/assets/css/bootstrap.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" type="text/css" href="/assets/css/signin.css">
 </head>
-<body>
-  <div class="container-signin">
-    <div>
-      <form method="post" class="redeSocial-form" id="form-signup">
-        <span>Create your Rede Social Account</span>
-        <div>
-          <input type="text" name="name" id="name" placeholder="Enter your name" required>
-        </div>
-        <div>
-          <input type="text" name="nick" id="nick" placeholder="Enter your nick" required>
-        </div>
-        <div>
-          <input type="email" name="email" id="email" placeholder="Enter your email" required>
-        </div>
-        <div>
-          <input type="password" name="password" id="password" placeholder="Enter your password" required>
-        </div>
-        <div>
-          <input type="password" name="confirm-password" id="confirm-password" placeholder="Confirm your password" required>
-        </div>
-        <a href="/signin">Click here to sign in</a>
-        <button type="submit" class="btn-redeSocial">Create</button>
-      </form>
-    </div>
-  </div>
+<body class="bg-light text-center">
 
-  <script src="/assets/js/jquery-3.6.1.min.js"></script>
+  <main class="form-signin">
+    <form id="form-signup" method="post">
+      <img class="mb-4" src="\assets\img\connectdevelop.svg" alt="" width="72" height="57">
+      <h1 class="h3 mb-3 fw-normal">Create your Rede Social Account</h1>
+  
+      <div class="form-floating pb-2">
+        <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+        <label for="name">Name</label>
+      </div>
+      <div class="form-floating pb-2">
+        <input type="text" class="form-control" id="nick" name="nick" placeholder="Enter your nick" required>
+        <label for="nick">Nick</label>
+      </div>
+      <div class="form-floating pb-2">
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+        <label for="email">Email address</label>
+      </div>
+      <div class="form-floating pb-2">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+        <label for="password">Password</label>
+      </div>
+      <div class="form-floating pb-2">
+        <input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="Confirm your password" required>
+        <label for="confirm-password">Confirm your password</label>
+      </div>
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Create</button>
+      <p class="m-3"><a href="/signin">Sign in instead</a><span class="text-light"></p>
+    </form>
+  </main>
+
+  <!-- Global scripts -->
+  {{ template "scripts" }}
+  <!-- Scripts for this view -->
   <script src="/assets/js/signup.js"></script>
 </body>
 </html>

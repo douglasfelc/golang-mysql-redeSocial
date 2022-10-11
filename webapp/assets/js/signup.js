@@ -5,7 +5,7 @@ function userSignUp(event){
   event.preventDefault()
 
   if( $("#password").val() != $("#confirm-password").val() ){
-    alert("Passwords don't match")
+    Swal.fire("Ops...", "Passwords don't match", "error")
     return
   }
 
@@ -32,10 +32,24 @@ function userSignUp(event){
 
       if (response.status >= 400){
         // StatusCode: range of 400 or 500
-        alert("Error registering user!")
+        Swal.fire("Ops...", "Error registering user", "error")
       }else{
         // StatusCode: range of 200
-        alert("User registered successfully!")
+        Swal.fire("Success!", "User registered successfully!", "success")
+        .then(function() {
+          $.ajax({
+            url: "/signin",
+            method: "POST",
+            data: {
+              email: $('#email').val(),
+              password: $('#password').val()
+            }
+          }).done(function() {
+            window.location = "/feed";
+          }).fail(function() {
+            Swal.fire("Ops...", "Error authenticating user!", "error");
+          })
+        })
       }
     }
   })
