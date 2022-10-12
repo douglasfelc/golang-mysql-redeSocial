@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"webapp/src/config"
 	"webapp/src/cookies"
 	"webapp/src/models"
@@ -19,6 +20,28 @@ import (
 
 // SignInScreen renders the signin screen
 func SignInScreen(w http.ResponseWriter, r *http.Request) {
+
+	cookie, _ := cookies.Read(r)
+
+	// Check if token exists
+	// In addition, below it is necessary to check if the token is still valid
+	if cookie["token"] != "" {
+
+		// Convert the id in the cookie to uint64
+		userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+		url := fmt.Sprintf("%s/users/%d", config.APIURL, userID)
+		response, _ := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
+		defer response.Body.Close()
+
+		// Checks if the token is valid
+		if response.StatusCode <= 201 {
+			// Send to feed
+			http.Redirect(w, r, "/feed", 302)
+			return
+		}
+	}
+
 	utils.ExecuteTemplate(w, "signin.html", nil)
 }
 
@@ -38,8 +61,10 @@ func FeedScreen(w http.ResponseWriter, r *http.Request) {
 	}
 	defer response.Body.Close()
 
+	// If the StatusCode is an error
 	if response.StatusCode >= 400 {
-		responses.StatusCodeError(w, response)
+		// Send to signin
+		http.Redirect(w, r, "/signin", 302)
 		return
 	}
 
@@ -100,4 +125,72 @@ func UpdatePostScreen(w http.ResponseWriter, r *http.Request) {
 
 	// Send request posts to the template
 	utils.ExecuteTemplate(w, "post-update.html", post)
+}
+
+// UsersScreen renders the page with the users filtered out
+func UsersScreen(w http.ResponseWriter, r *http.Request) {
+
+	// Get the "search" user coming by get
+	nameOrNick := strings.ToLower(r.URL.Query().Get("search"))
+
+	url := fmt.Sprintf("%s/users?user=%s", config.APIURL, nameOrNick)
+	response, error := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
+	if error != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.StatusCodeError(w, response)
+		return
+	}
+
+	var users []models.User
+	// Convert response body from JSON to struct
+	if error = json.NewDecoder(response.Body).Decode(&users); error != nil {
+		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	// Send request users to the template
+	utils.ExecuteTemplate(w, "users.html", users)
+}
+
+// UserScreen renders the user profile page
+func UserScreen(w http.ResponseWriter, r *http.Request) {
+	// Get the parameters sent in the route, ex: /{userId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	userID, error := strconv.ParseUint(params["userId"], 10, 64)
+	if error != nil {
+		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	cookie, _ := cookies.Read(r)
+	LoggedInUserID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	// If the requested user is the same as the user who is logged in
+	if userID == LoggedInUserID {
+		// Redirects to profile page
+		http.Redirect(w, r, "/profile", 302)
+		return
+	}
+
+	// Get the full user (with following, followers and posts)
+	user, error := models.GetFullUser(userID, r)
+	if error != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	utils.ExecuteTemplate(w, "user.html", struct {
+		User           models.User
+		LoggedInUserID uint64
+	}{
+		User:           user,
+		LoggedInUserID: LoggedInUserID,
+	})
 }

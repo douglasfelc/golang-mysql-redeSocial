@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rede Social - User {{ .User.Name }}</title>
+
+  <link href="/assets/css/bootstrap.css" rel="stylesheet" type="text/css">
+</head>
+<body class="bg-light">
+
+  {{ .User.ID }} {{ .LoggedInUserID }}
+
+  {{ $UserLoggedFollow := false }}
+  {{ range .User.Followers }}
+    {{ if (eq .ID $.LoggedInUserID )}}
+      {{ $UserLoggedFollow = true}}
+    {{ end }}
+  {{ end }}
+
+  <div class="container mt-4">
+    <div class="row">
+      {{ template "menu-main" }}
+      <div class="col">
+        <div class="bg-white border rounded-3 p-4">
+
+          <h5 class="card-title">{{ .User.Name }}</h5>
+          <p class="card-subtitle m-0 text-muted">@{{ .User.Nick }}</p>
+          <p class="card-subtitle m-0 text-muted">Member since: {{ .User.CreatedAt.Format "01-02-2006" }}</p>
+
+          <p class="mt-2">
+            <a href="#" data-toggle="modal" data-target="#modal-seguidores">
+              Followers: {{ len .User.Followers }}
+            </a>
+          </p>
+          <p>
+            <a href="#" data-toggle="modal" data-target="#modal-seguindo">
+              Following: {{ len .User.Following }}
+            </a>
+          </p>
+
+
+          <a href="#" class="card-link">
+            {{ if $UserLoggedFollow }}
+              <button id="unfollow" class="btn btn-info" data-usuario-id="{{ .User.ID }}">
+                Unfollow
+              </button>
+            {{ else }}
+              <button id="follow" class="btn btn-info" data-usuario-id="{{ .User.ID }}">
+                Follow
+              </button>
+            {{ end }}
+          </a>
+
+
+          <h5 class="mt-4">Posts of @{{ .User.Nick }}</h5>
+          <p class="card-text">
+            {{ range .User.Posts }}
+              {{ template "post-without-permission" . }}
+            {{ else }}
+              <p class="text-muted">
+                No posts yet...
+              </p>
+            {{ end }}
+          </p>
+
+          
+        </div>
+      </div>
+      {{ template "right-panel" }}
+    </div>
+  </div>
+
+  {{ template "footer" }}
+  <!-- Global scripts -->
+  {{ template "scripts" }}
+  <!-- Scripts for this view -->
+  <script src="/assets/js/posts.js"></script>
+</body>
+</html>

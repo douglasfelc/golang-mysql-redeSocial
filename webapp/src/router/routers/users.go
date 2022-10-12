@@ -20,4 +20,18 @@ var userRouters = []Router{
 		Function:               controllers.CreateUser,
 		authenticationRequired: false,
 	},
+	// Route to load filtered users page
+	{
+		URI:                    "/users",
+		Method:                 http.MethodGet,
+		Function:               controllers.UsersScreen,
+		authenticationRequired: true,
+	},
+	// Route to load user page
+	{
+		URI:                    "/users/{userId}",
+		Method:                 http.MethodGet,
+		Function:               controllers.UserScreen,
+		authenticationRequired: true,
+	},
 }

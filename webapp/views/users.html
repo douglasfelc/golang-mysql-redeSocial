@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rede Social - Users</title>
+
+  <link href="/assets/css/bootstrap.css" rel="stylesheet" type="text/css">
+</head>
+<body class="bg-light">
+
+  <div class="container mt-4">
+    <div class="row">
+      {{ template "menu-main" }}
+      <div class="col">
+        <div class="bg-white border rounded-3 p-4">
+          <h5>Users found</h5>
+          {{ range . }}
+            <div class="my-3">
+              <p class="m-0">{{ .Name }}</p>
+              <p class="m-0"><a href="/users/{{ .ID }}">@{{ .Nick }}</a></p>
+              <p class="m-0">Member since: {{ .CreatedAt.Format "01-02-2006" }}</p>
+            </div>
+          {{ else }}
+            <p class="card-text">
+              No users found!
+            </p>
+          {{ end }}
+        </div>
+      </div>
+      {{ template "right-panel" }}
+    </div>
+  </div>
+
+  {{ template "footer" }}
+  <!-- Global scripts -->
+  {{ template "scripts" }}
+</body>
+</html>

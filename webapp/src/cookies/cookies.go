@@ -2,6 +2,7 @@ package cookies
 
 import (
 	"net/http"
+	"time"
 	"webapp/src/config"
 
 	"github.com/gorilla/securecookie"
@@ -51,4 +52,15 @@ func Read(r *http.Request) (map[string]string, error) {
 	}
 
 	return values, nil
+}
+
+// Delete clear cookie information
+func Delete(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "redeSocialCookie",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Expires:  time.Unix(0, 0),
+	})
 }
