@@ -1,0 +1,24 @@
+{{ define "modal-following" }}
+  <div class="modal fade" id="modal-following" tabindex="-1" aria-labelledby="modal-followingLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modal-followingLabel">Following</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {{ range .Following }}
+            <a href="/users/{{ .ID }}">{{ .Nick }}</a> <br/>
+          {{ else }}
+            <p class="text-muted text-center">
+              Not following anyone at the moment...
+            </p>
+          {{ end }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{{ end }}

@@ -127,7 +127,9 @@ func GetFollowers(canal chan<- []User, userID uint64, r *http.Request) {
 		return
 	}
 
+	// If the user has no followers
 	if followers == nil {
+		// It sends an empty slice, because above when the information is being sent to the channel, the value nil means that it was not able to capture the information, which is different from not having the information
 		canal <- make([]User, 0)
 		return
 	}
@@ -155,7 +157,9 @@ func GetFollowing(canal chan<- []User, userID uint64, r *http.Request) {
 		return
 	}
 
+	// If the user has no following
 	if following == nil {
+		// It sends an empty slice, because above when the information is being sent to the channel, the value nil means that it was not able to capture the information, which is different from not having the information
 		canal <- make([]User, 0)
 		return
 	}
@@ -183,7 +187,9 @@ func GetPosts(canal chan<- []Post, userID uint64, r *http.Request) {
 		return
 	}
 
+	// If the user has no posts
 	if posts == nil {
+		// It sends an empty slice, because above when the information is being sent to the channel, the value nil means that it was not able to capture the information, which is different from not having the information
 		canal <- make([]Post, 0)
 		return
 	}

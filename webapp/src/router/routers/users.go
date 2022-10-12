@@ -34,4 +34,20 @@ var userRouters = []Router{
 		Function:               controllers.UserScreen,
 		authenticationRequired: true,
 	},
+	// Route to follow user by id
+	// userId of the user being followed
+	{
+		URI:                    "/users/{userId}/follow",
+		Method:                 http.MethodPost,
+		Function:               controllers.FollowUser,
+		authenticationRequired: true,
+	},
+	// Route to unfollow user by id
+	// userId of the user being unfollowed
+	{
+		URI:                    "/users/{userId}/unfollow",
+		Method:                 http.MethodPost,
+		Function:               controllers.UnFollowUser,
+		authenticationRequired: true,
+	},
 }
