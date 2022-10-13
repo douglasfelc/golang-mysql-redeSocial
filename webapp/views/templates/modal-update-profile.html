@@ -1,0 +1,36 @@
+{{ define "modal-update-profile" }}
+  <div class="modal fade" id="modal-update-profile" tabindex="-1" aria-labelledby="modal-update-profileLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="POST" id="update-profile">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modal-update-profileLabel">Update profile</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Enter a name" required value="{{ .Name }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="nick" class="form-label">Nick</label>
+              <input type="text" class="form-control" id="nick" name="nick" placeholder="Enter a nick" required value="{{ .Nick }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Enter an email address" required value="{{ .Email }}">
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{{ end }}

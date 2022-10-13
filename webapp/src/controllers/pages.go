@@ -170,14 +170,9 @@ func UserScreen(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie, _ := cookies.Read(r)
-	LoggedInUserID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
-	// If the requested user is the same as the user who is logged in
-	if userID == LoggedInUserID {
-		// Redirects to profile page
-		http.Redirect(w, r, "/profile", 302)
-		return
-	}
+	// Convert the id in the cookie to uint64
+	LoggedInUserID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
 	// Get the full user (with following, followers and posts)
 	user, error := models.GetFullUser(userID, r)
@@ -193,4 +188,12 @@ func UserScreen(w http.ResponseWriter, r *http.Request) {
 		User:           user,
 		LoggedInUserID: LoggedInUserID,
 	})
+}
+
+// Profile redirects to the logged in user page
+func Profile(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := cookies.Read(r)
+	LoggedInUserID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+	url := fmt.Sprintf("/users/%d", LoggedInUserID)
+	http.Redirect(w, r, url, 302)
 }

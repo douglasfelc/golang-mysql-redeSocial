@@ -34,6 +34,34 @@ var userRouters = []Router{
 		Function:               controllers.UserScreen,
 		authenticationRequired: true,
 	},
+	// Route to load the page of the logged in user
+	{
+		URI:                    "/profile",
+		Method:                 http.MethodGet,
+		Function:               controllers.Profile,
+		authenticationRequired: true,
+	},
+	// Route to update logged user information
+	{
+		URI:                    "/update-profile",
+		Method:                 http.MethodPut,
+		Function:               controllers.UpdateProfile,
+		authenticationRequired: true,
+	},
+	// Route to update password for logged in user
+	{
+		URI:                    "/update-password",
+		Method:                 http.MethodPost,
+		Function:               controllers.UpdatePassword,
+		authenticationRequired: true,
+	},
+	// Route to remove logged in user account
+	{
+		URI:                    "/delete-user",
+		Method:                 http.MethodDelete,
+		Function:               controllers.DeleteUser,
+		authenticationRequired: true,
+	},
 	// Route to follow user by id
 	// userId of the user being followed
 	{
