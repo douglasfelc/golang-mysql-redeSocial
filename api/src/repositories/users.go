@@ -337,3 +337,56 @@ func (repository users) UpdatePassword(userID uint64, newPassword string) error 
 
 	return nil
 }
+
+// WhoToFollow returns a list of users for the user to follow
+func (repository users) WhoToFollow(userID uint64) ([]models.User, error) {
+
+	// Make the request in the database
+	rows, error := repository.db.Query(`
+		SELECT u.id, u.name, u.nick, u.email, u.createdAt 
+		FROM users u 
+		WHERE u.id <> ? 
+		AND NOT FIND_IN_SET(u.id, 
+			(
+				SELECT 
+					CASE 
+						WHEN LENGTH(GROUP_CONCAT(f.user_id)) > 0 
+						THEN GROUP_CONCAT(f.user_id) 
+						ELSE 0
+					END
+				FROM followers f 
+				WHERE f.follower_id = ?
+			)
+		)
+		LIMIT 5
+		`, userID, userID,
+	)
+	if error != nil {
+		return nil, error
+	}
+	defer rows.Close()
+
+	var users []models.User
+
+	// Iterates through the rows returned from the database
+	for rows.Next() {
+		var user models.User
+
+		// Read the line
+		if error = rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.CreatedAt,
+		); error != nil {
+			return nil, error
+		}
+
+		// Include the row user in the users slice
+		users = append(users, user)
+	}
+
+	// If successful, returns users with the filter applied
+	return users, nil
+}

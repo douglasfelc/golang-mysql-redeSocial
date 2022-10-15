@@ -6,6 +6,11 @@
 
     <div class="p-3 mt-4 bg-white border rounded-3">
       Who to follow?
+
+      {{ range . }}
+        <p class="card-subtitle m-0 mt-2 text-muted">{{ .Name }}</p>
+        <p class="card-subtitle m-0"><a href="/users/{{ .ID }}">@{{ .Nick }}</a></p>
+      {{ end }}
     </div>
   </div>
 {{ end }}

@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/requests"
 )
 
@@ -195,4 +197,45 @@ func GetPosts(canal chan<- []Post, userID uint64, r *http.Request) {
 	}
 
 	canal <- posts
+}
+
+// WhoToFollow calls the api, get the users and cut the first 5 to display in the right pane
+func WhoToFollow(w http.ResponseWriter, r *http.Request) ([]User, error) {
+
+	// Read the Cookie, ignoring the error as the middleware has already verified this
+	cookie, _ := cookies.Read(r)
+
+	// Convert the id in the cookie to uint64
+	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	// Mount the url, eg http://localhost:5000/users/{userId}/whotofollow
+	url := fmt.Sprintf("%s/users/%d/whotofollow", config.APIURL, userID)
+
+	// Send the request with authentication to the API
+	responseUsers, error := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
+	if error != nil {
+		return make([]User, 0), error
+	}
+	defer responseUsers.Body.Close()
+
+	// If the StatusCode is an error
+	if responseUsers.StatusCode >= 400 {
+		// Send to signin
+		http.Redirect(w, r, "/signin", 302)
+		return make([]User, 0), nil
+	}
+
+	var users []User
+	// Convert response body from JSON to struct
+	if error = json.NewDecoder(responseUsers.Body).Decode(&users); error != nil {
+		return make([]User, 0), error
+	}
+
+	// If you have more than 5 users
+	if len(users) > 5 {
+		// Cut only the first 5
+		users = users[0:5]
+	}
+
+	return users, nil
 }

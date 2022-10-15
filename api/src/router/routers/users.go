@@ -71,6 +71,13 @@ var userRouters = []Router{
 		Function:               controllers.GetFollowing,
 		authenticationRequired: true,
 	},
+	// Route to see who the user can follow
+	{
+		URI:                    "/users/{userId}/whotofollow",
+		Method:                 http.MethodGet,
+		Function:               controllers.WhoToFollow,
+		authenticationRequired: true,
+	},
 	// Route to update user password
 	// Normally, POST is used to update the password.
 	// Because if you make two PUT requests passing exactly the same data, the second one will have no effect.

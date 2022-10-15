@@ -10,26 +10,14 @@ function userSignIn(event){
     data: {
       email: $("#email").val(),
       password: $("#password").val(),
-    },
-    complete: function (response) {
-      console.info(response)
-      console.info(response.status)
-
-      if (response.status >= 400){
-        // StatusCode: range of 400 or 500
-        Swal.fire("Error signin!", "Incorrect username or password", "error")
-      }else{
-        // StatusCode: range of 200
-        console.log("Signin successfully!")
-        window.location = "/feed"
-      }
     }
   }).done(function(){
-    console.log("Done signin")
-    //window.location = "/feed"
-
+    // StatusCode: range of 200
+    console.log("Signin successfully!")
+    window.location = "/feed"
   }).fail(function(){
-    console.log("Fail signin")
+    // StatusCode: range of 400 or 500
+    Swal.fire("Error signin!", "Incorrect username or password", "error")
   })
 
 }

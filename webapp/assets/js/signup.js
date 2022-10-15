@@ -17,41 +17,27 @@ function userSignUp(event){
       nick: $("#nick").val(),
       email: $("#email").val(),
       password: $("#password").val(),
-    },
-    success: function (response) {
-      console.log("success");
-      console.info(response)
-    },
-    error: function (response) {
-      console.log("error");
-      console.info(response)
-    },
-    complete: function (response) {
-      console.info(response)
-      console.info(response.status)
-
-      if (response.status >= 400){
-        // StatusCode: range of 400 or 500
-        Swal.fire("Ops...", "Error registering user", "error")
-      }else{
-        // StatusCode: range of 200
-        Swal.fire("Success!", "User registered successfully!", "success")
-        .then(function() {
-          $.ajax({
-            url: "/signin",
-            method: "POST",
-            data: {
-              email: $('#email').val(),
-              password: $('#password').val()
-            }
-          }).done(function() {
-            window.location = "/feed";
-          }).fail(function() {
-            Swal.fire("Ops...", "Error authenticating user!", "error");
-          })
-        })
-      }
     }
+  }).done(function() {
+    // StatusCode: range of 200
+    Swal.fire("Success!", "User registered successfully!", "success")
+    .then(function() {
+      $.ajax({
+        url: "/signin",
+        method: "POST",
+        data: {
+          email: $('#email').val(),
+          password: $('#password').val()
+        }
+      }).done(function() {
+        window.location = "/feed";
+      }).fail(function() {
+        Swal.fire("Ops...", "Error authenticating user!", "error");
+      })
+    })
+  }).fail(function() {
+    // StatusCode: range of 400 or 500
+    Swal.fire("Ops...", "Error registering user", "error")
   })
 
 }

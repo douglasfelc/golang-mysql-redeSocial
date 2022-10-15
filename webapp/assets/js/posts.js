@@ -14,26 +14,13 @@ function newPost(event){
     method: "POST",
     data: {
       content: $("#content").val(),
-    },
-    complete: function (response) {
-      console.info(response)
-      console.info(response.status)
-
-      if (response.status >= 400){
-        // StatusCode: range of 400 or 500
-        Swal.fire("Ops...", "Error post", "error")
-      }else{
-        // StatusCode: range of 200
-        console.log("Post successfully!")
-        window.location = "/feed"
-      }
     }
   }).done(function(){
-    console.log("Done post")
-    //window.location = "/feed"
-
+    console.log("Post successfully!")
+    window.location = "/feed"
   }).fail(function(){
-    console.log("Fail post")
+    // StatusCode: range of 400 or 500
+    Swal.fire("Ops...", "Error post", "error")
   })
 }
 

@@ -71,7 +71,11 @@
           <h5 class="mt-4">Posts of @{{ .User.Nick }}</h5>
           <p class="card-text">
             {{ range .User.Posts }}
-              {{ template "post-without-permission" . }}
+              {{ if (eq $.User.ID $.LoggedInUserID )}}
+                {{ template "post-with-permission" . }}
+              {{ else }}
+                {{ template "post-without-permission" . }}
+              {{ end }}
             {{ else }}
               <p class="text-muted">
                 No posts yet...
@@ -82,7 +86,7 @@
           
         </div>
       </div>
-      {{ template "right-panel" }}
+      {{ template "right-panel" .WhoToFollow }}
     </div>
   </div>
 

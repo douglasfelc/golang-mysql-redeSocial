@@ -31,6 +31,8 @@ func SignInScreen(w http.ResponseWriter, r *http.Request) {
 		userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
 		url := fmt.Sprintf("%s/users/%d", config.APIURL, userID)
+
+		// Send the request with authentication to the API
 		response, _ := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
 		defer response.Body.Close()
 
@@ -53,16 +55,19 @@ func SignUpScreen(w http.ResponseWriter, r *http.Request) {
 // FeedScreen renders the feed screen
 func FeedScreen(w http.ResponseWriter, r *http.Request) {
 
+	// Mount the url, eg http://localhost:5000/posts
 	url := fmt.Sprintf("%s/posts", config.APIURL)
-	response, error := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
+
+	// Send the request with authentication to the API
+	responsePosts, error := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
 	if error != nil {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
 		return
 	}
-	defer response.Body.Close()
+	defer responsePosts.Body.Close()
 
 	// If the StatusCode is an error
-	if response.StatusCode >= 400 {
+	if responsePosts.StatusCode >= 400 {
 		// Send to signin
 		http.Redirect(w, r, "/signin", 302)
 		return
@@ -70,8 +75,15 @@ func FeedScreen(w http.ResponseWriter, r *http.Request) {
 
 	var posts []models.Post
 	// Convert response body from JSON to struct
-	if error = json.NewDecoder(response.Body).Decode(&posts); error != nil {
+	if error = json.NewDecoder(responsePosts.Body).Decode(&posts); error != nil {
 		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	// Get the users to display in `Who To Follow` in the right pane
+	whoToFollow, error := models.WhoToFollow(w, r)
+	if error != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
 		return
 	}
 
@@ -83,11 +95,13 @@ func FeedScreen(w http.ResponseWriter, r *http.Request) {
 
 	// Send request posts and cookie userID to the template
 	utils.ExecuteTemplate(w, "feed.html", struct {
-		Posts  []models.Post
-		UserID uint64
+		Posts       []models.Post
+		WhoToFollow []models.User
+		UserID      uint64
 	}{
-		Posts:  posts,
-		UserID: userID,
+		Posts:       posts,
+		WhoToFollow: whoToFollow,
+		UserID:      userID,
 	})
 }
 
@@ -103,7 +117,10 @@ func UpdatePostScreen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Mount the url, eg http://localhost:5000/posts/{postId}
 	url := fmt.Sprintf("%s/posts/%d", config.APIURL, postID)
+
+	// Send the request with authentication to the API
 	response, error := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
 	if error != nil {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
@@ -133,7 +150,10 @@ func UsersScreen(w http.ResponseWriter, r *http.Request) {
 	// Get the "search" user coming by get
 	nameOrNick := strings.ToLower(r.URL.Query().Get("search"))
 
+	// Mount the url, eg http://localhost:5000/users?user=%s
 	url := fmt.Sprintf("%s/users?user=%s", config.APIURL, nameOrNick)
+
+	// Send the request with authentication to the API
 	response, error := requests.RequestWithAuthentication(r, http.MethodGet, url, nil)
 	if error != nil {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
@@ -153,8 +173,21 @@ func UsersScreen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get the users to display in `Who To Follow` in the right pane
+	whoToFollow, error := models.WhoToFollow(w, r)
+	if error != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
 	// Send request users to the template
-	utils.ExecuteTemplate(w, "users.html", users)
+	utils.ExecuteTemplate(w, "users.html", struct {
+		Users       []models.User
+		WhoToFollow []models.User
+	}{
+		Users:       users,
+		WhoToFollow: whoToFollow,
+	})
 }
 
 // UserScreen renders the user profile page
@@ -166,6 +199,13 @@ func UserScreen(w http.ResponseWriter, r *http.Request) {
 	userID, error := strconv.ParseUint(params["userId"], 10, 64)
 	if error != nil {
 		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: error.Error()})
+		return
+	}
+
+	// Get the users to display in `Who To Follow` in the right pane
+	whoToFollow, error := models.WhoToFollow(w, r)
+	if error != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: error.Error()})
 		return
 	}
 
@@ -183,9 +223,11 @@ func UserScreen(w http.ResponseWriter, r *http.Request) {
 
 	utils.ExecuteTemplate(w, "user.html", struct {
 		User           models.User
+		WhoToFollow    []models.User
 		LoggedInUserID uint64
 	}{
 		User:           user,
+		WhoToFollow:    whoToFollow,
 		LoggedInUserID: LoggedInUserID,
 	})
 }

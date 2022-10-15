@@ -16,7 +16,7 @@
       <div class="col">
         <div class="bg-white border rounded-3 p-4">
           <h5>Users found</h5>
-          {{ range . }}
+          {{ range .Users }}
             <div class="my-3">
               <p class="m-0">{{ .Name }}</p>
               <p class="m-0"><a href="/users/{{ .ID }}">@{{ .Nick }}</a></p>
@@ -29,7 +29,7 @@
           {{ end }}
         </div>
       </div>
-      {{ template "right-panel" }}
+      {{ template "right-panel" .WhoToFollow }}
     </div>
   </div>
 

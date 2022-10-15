@@ -459,3 +459,34 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	// If successful, reply with StatusNoContent
 	responses.JSON(w, http.StatusNoContent, nil)
 }
+
+// WhoToFollow returns a list of users for the user to follow
+func WhoToFollow(w http.ResponseWriter, r *http.Request) {
+	// Get the parameters sent in the route, ex: /{userId}
+	params := mux.Vars(r)
+
+	// Convert ID to uint64
+	userID, error := strconv.ParseUint(params["userId"], 10, 64)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	// Connect to the database
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+	}
+	defer db.Close()
+
+	// Create the repository, passing the database as a parameter
+	repository := repositories.NewUsersRepository(db)
+	users, error := repository.WhoToFollow(userID)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	// If successful, reply with StatusOK and followers in JSON
+	responses.JSON(w, http.StatusOK, users)
+}
